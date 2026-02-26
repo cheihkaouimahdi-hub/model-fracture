@@ -67,7 +67,7 @@ async def predict(
         image_b64 = base64.b64encode(data).decode("ascii")
         result["image_data_url"] = f"data:{mime_type};base64,{image_b64}"
 
-    if show_cam:
+    if show_cam and result.get("label") != "NORMAL":
         result.update(gradcam_pil(app.state.model, img, cam_thr=cam_thr))
 
     return result

@@ -1,0 +1,11 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mma-api
+    ports:
+      - "8000:8000"
+    environment:
+      MODEL_PATH: best_densenet169_legfracture.pt
+    restart: unless-stopped
