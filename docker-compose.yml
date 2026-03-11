@@ -8,4 +8,18 @@ services:
       - "8000:8000"
     environment:
       MODEL_PATH: best_densenet169_legfracture.pt
+      CAM_METHOD: gradcampp
+      CAM_TARGET_LAYER: denseblock4_last_conv
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     restart: unless-stopped

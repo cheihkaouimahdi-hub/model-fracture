@@ -1,5 +1,6 @@
 import base64
 import io
+from typing import Literal
 
 from fastapi import FastAPI, File, Query, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -31,7 +32,15 @@ async def predict(
     file: UploadFile = File(...),
     show_image: bool = False,
     show_cam: bool = False,
-    cam_thr: float = Query(0.55, ge=0.0, le=1.0),
+    cam_thr: float = Query(0.8, ge=0.0, le=1.0),
+    cam_method: Literal["gradcam", "gradcampp"] = Query("gradcampp"),
+    target_layer: Literal["denseblock4_last_conv", "denseblock4", "norm5"] = Query(
+        "denseblock4_last_conv"
+    ),
+    hotspot_percentile: float = Query(92.0, ge=0.0, le=100.0),
+    min_area: int = Query(35, ge=1, le=224 * 224),
+    morph_kernel: int = Query(3, ge=1, le=9),
+    tighten_iter: int = Query(1, ge=0, le=3),
 ):
     if file.content_type and not (
         file.content_type.startswith("image/")
@@ -68,6 +77,18 @@ async def predict(
         result["image_data_url"] = f"data:{mime_type};base64,{image_b64}"
 
     if show_cam and result.get("label") != "NORMAL":
-        result.update(gradcam_pil(app.state.model, img, cam_thr=cam_thr))
+        result.update(
+            gradcam_pil(
+                app.state.model,
+                img,
+                cam_thr=cam_thr,
+                min_area=min_area,
+                hotspot_percentile=hotspot_percentile,
+                cam_method=cam_method,
+                target_layer=target_layer,
+                morph_kernel=morph_kernel,
+                tighten_iter=tighten_iter,
+            )
+        )
 
     return result

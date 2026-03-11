@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mma-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mma-api
+  template:
+    metadata:
+      labels:
+        app: mma-api
+    spec:
+      containers:
+        - name: mma-api
+          image: yourdockerhubusername/mma-api:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MODEL_PATH
+              value: best_densenet169_legfracture.pt
+            - name: CAM_METHOD
+              value: gradcampp
+            - name: CAM_TARGET_LAYER
+              value: denseblock4_last_conv
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 12
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 3

@@ -240,6 +240,7 @@ UI_HTML = """
         addImageCard("Uploaded image", data.image_data_url);
         addImageCard("Input 224", data.input_224_data_url);
         addImageCard("Grad-CAM heatmap", data.cam_heatmap_data_url);
+        addImageCard("Binary mask", data.mask_data_url);
         addImageCard("Overlay", data.overlay_data_url);
         addImageCard("Overlay + Box", data.overlay_box_data_url);
 
